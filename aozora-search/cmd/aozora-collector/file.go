@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"path"
@@ -40,7 +41,6 @@ func findEntires(siteURL string) ([]Entry, error) {
 	entries := []Entry{}
 	doc.Find("ol li a").Each(func(n int, elem *goquery.Selection) {
 		token := pat.FindStringSubmatch(elem.AttrOr("href", ""))
-		// fmt.Printf("token: %#v\n", token)
 		if len(token) != 3 {
 			return
 		}
@@ -61,7 +61,7 @@ func findEntires(siteURL string) ([]Entry, error) {
 				ZipURL:   zipURL,
 			})
 		}
-		// fmt.Printf("author: %#v, zipURL: %#v\n", author, zipURL)
+		log.Printf("found the src; author: %s, zipURL: %s\n", author, zipURL)
 	})
 	return entries, nil
 }
@@ -78,7 +78,6 @@ func findAuthorAndZIP(siteURL string) (string, string) {
 	}
 
 	author := doc.Find("table[summary=作家データ] tr:nth-child(2) td:nth-child(2)").Text()
-	// println(author)
 
 	var zipURL string
 	doc.Find("table.download a").Each(func(n int, elem *goquery.Selection) {
@@ -143,5 +142,5 @@ func extractText(zipURL string) (string, error) {
 		}
 	}
 
-	return "", errors.New("no contents(text files) found in the zip file")
+	return "", errors.New("no more contents(text files) found in the zip file")
 }

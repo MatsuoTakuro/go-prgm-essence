@@ -1,15 +1,11 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
 	"log"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
-	db, err := sql.Open("sqlite3", "database.sqlite")
+	db, err := setupDB("database.sqlite")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,7 +23,10 @@ func main() {
 			log.Println(err)
 			continue
 		}
-		fmt.Println(e.SiteURL)
-		fmt.Println(content)
+		err = addEntry(db, &e, content)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
 	}
 }
