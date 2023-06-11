@@ -2,75 +2,80 @@ package main
 
 import (
 	"database/sql"
-	"flag"
 	"fmt"
 	"log"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/spf13/cobra"
 )
 
-const USAGE = `
-Usage of ./aozora-search [sub-command] [...]:
-  -d string
-        database (default "database.sqlite")
-
-Sub-commands:
-    authors
-    titles  [AuthorID]
-    content [AuthorID] [TitleID]
-    query   [Query]
-`
+var rootCmd = &cobra.Command{
+	Use:   "aozora-search",
+	Short: "Aozora Search is a CLI for searching Aozora Bunko",
+	Long:  `Aozora Search is a CLI for searching Aozora Bunko. It provides several sub-commands for different types of searches.`,
+}
 
 func main() {
 	var dsn string
-	flag.StringVar(&dsn, "d", "database.sqlite", "database")
-	flag.Usage = func() {
-		fmt.Print(USAGE)
-	}
-	flag.Parse()
-
-	if flag.NArg() == 0 {
-		flag.Usage()
-		os.Exit(2)
-	}
-
+	rootCmd.PersistentFlags().StringVarP(&dsn, "database", "d", "database.sqlite", "database")
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	switch flag.Arg(0) {
-	case "authors":
-		err = showAuthors(db)
-
-	case "titles":
-		if flag.NArg() != 2 {
-			flag.Usage()
-			os.Exit(2)
-		}
-		err = showTitles(db, flag.Arg(1))
-
-	case "content":
-		if flag.NArg() != 3 {
-			flag.Usage()
-			os.Exit(2)
-		}
-		err = showContent(db, flag.Arg(1), flag.Arg(2))
-
-	case "query":
-		if flag.NArg() != 2 {
-			flag.Usage()
-			os.Exit(2)
-		}
-		err = queryContent(db, flag.Arg(1))
-
-	default:
-		err = fmt.Errorf("no support for this sub command; %s", flag.Arg(0))
+	authorsCmd := &cobra.Command{
+		Use:   "authors",
+		Short: "Show authors",
+		Run: func(cmd *cobra.Command, args []string) {
+			err := showAuthors(db)
+			if err != nil {
+				log.Fatal(err)
+			}
+		},
 	}
 
-	if err != nil {
-		log.Fatal(err)
+	titlesCmd := &cobra.Command{
+		Use:   "titles [AuthorID]",
+		Short: "Show titles",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			err := showTitles(db, args[0])
+			if err != nil {
+				log.Fatal(err)
+			}
+		},
+	}
+
+	contentCmd := &cobra.Command{
+		Use:   "content [AuthorID] [TitleID]",
+		Short: "Show content",
+		Args:  cobra.ExactArgs(2),
+		Run: func(cmd *cobra.Command, args []string) {
+			err := showContent(db, args[0], args[1])
+			if err != nil {
+				log.Fatal(err)
+			}
+		},
+	}
+
+	queryCmd := &cobra.Command{
+		Use:   "query [Query]",
+		Short: "Show contents hit with query",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			err := queryContent(db, args[0])
+			if err != nil {
+				log.Fatal(err)
+			}
+		},
+	}
+
+	rootCmd.AddCommand(authorsCmd, titlesCmd, contentCmd, queryCmd)
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
