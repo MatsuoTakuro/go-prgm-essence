@@ -16,7 +16,7 @@ func main() {
 	defer db.Close()
 
 	var close func()
-	logger, close, err = setupLogger("log.json")
+	logger, close, err = setupLogger("./cmd/aozora-collector/log.json")
 	if err != err {
 		log.Fatal(err)
 	}
