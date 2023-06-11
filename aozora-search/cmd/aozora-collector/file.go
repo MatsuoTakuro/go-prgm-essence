@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"path"
@@ -61,7 +60,7 @@ func findEntires(siteURL string) ([]Entry, error) {
 				ZipURL:   zipURL,
 			})
 		}
-		log.Printf("found the src; author: %s, zipURL: %s\n", author, zipURL)
+		logger.Sugar().Infof("found the src; author: %s, zipURL: %s\n", author, zipURL)
 	})
 	return entries, nil
 }
@@ -77,7 +76,7 @@ func findAuthorAndZIP(siteURL string) (string, string) {
 		return "", ""
 	}
 
-	author := doc.Find("table[summary=作家データ] tr:nth-child(2) td:nth-child(2)").Text()
+	author := doc.Find("table[summary=作家データ] tr:nth-child(2) td:nth-child(2)").First().Text()
 
 	var zipURL string
 	doc.Find("table.download a").Each(func(n int, elem *goquery.Selection) {

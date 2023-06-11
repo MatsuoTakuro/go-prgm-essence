@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"log"
 	"strings"
 
 	"github.com/ikawaha/kagome-dict/ipa"
@@ -40,7 +39,7 @@ func addEntry(db *sql.DB, entry *Entry, content string) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("author updated sucessfully; author_id: %s, author: %s\n", entry.AuthorID, entry.Author)
+	logger.Sugar().Infof("author updated successfully; author_id: %s, author: %s\n", entry.AuthorID, entry.Author)
 
 	res, err := db.Exec(
 		`REPLACE INTO contents(author_id, title_id, title, content) values(?,?,?,?)`,
@@ -52,7 +51,7 @@ func addEntry(db *sql.DB, entry *Entry, content string) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("content updated sucessfully; title_id: %s, title: %s\n", entry.TitleID, entry.Title)
+	logger.Sugar().Infof("content updated successfully; title_id: %s, title: %s\n", entry.TitleID, entry.Title)
 
 	docID, err := res.LastInsertId()
 	if err != nil {
@@ -73,7 +72,7 @@ func addEntry(db *sql.DB, entry *Entry, content string) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("contents_fts updated sucessfully; docid: %d\n", docID)
+	logger.Sugar().Infof("contents_fts updated successfully; docid: %d\n", docID)
 
 	return nil
 }
