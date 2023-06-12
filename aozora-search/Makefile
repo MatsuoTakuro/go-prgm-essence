@@ -4,6 +4,7 @@ aozora-collector:
 
 aozora-search:
 	go build -o ./cmd/aozora-search/aozora-search ./cmd/aozora-search
+	./cmd/aozora-search/aozora-search -h
 	./cmd/aozora-search/aozora-search authors
 	./cmd/aozora-search/aozora-search titles 000338
 	./cmd/aozora-search/aozora-search content 000338 2289

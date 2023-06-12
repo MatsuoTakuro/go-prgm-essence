@@ -27,3 +27,6 @@ go.work
 .history/
 # Built Visual Studio Code Extensions
 *.vsix
+
+# output
+/cmd/aozora-search/aozora-search
