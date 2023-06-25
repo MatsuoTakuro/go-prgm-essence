@@ -25,6 +25,8 @@ type Entry struct {
 	ZipURL   string
 }
 
+var pageURLFormat = "https://www.aozora.gr.jp/cards/%s/card%s.html"
+
 func findEntires(siteURL string) ([]Entry, error) {
 	resp, err := http.Get(siteURL)
 	if err != nil {
@@ -45,9 +47,9 @@ func findEntires(siteURL string) ([]Entry, error) {
 		}
 		title := elem.Text()
 		pageURL := fmt.Sprintf(
-			"https://www.aozora.gr.jp/cards/%s/card%s.html",
-			token[1],
-			token[2],
+			pageURLFormat,
+			token[1], // author id
+			token[2], // title id
 		)
 		author, zipURL := findAuthorAndZIP(pageURL)
 		if zipURL != "" {

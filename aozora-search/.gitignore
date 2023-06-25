@@ -30,3 +30,5 @@ go.work
 
 # output
 /cmd/aozora-search/aozora-search
+/cmd/aozora-collector/*.sqlite
+/cmd/aozora-collector/*_test.json

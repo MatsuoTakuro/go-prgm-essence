@@ -2,11 +2,9 @@ package main
 
 import (
 	"log"
-
-	"go.uber.org/zap"
 )
 
-var logger *zap.Logger
+var logfilePath = "./cmd/aozora-collector/log.json"
 
 func main() {
 	db, err := setupDB("database.sqlite")
@@ -15,12 +13,20 @@ func main() {
 	}
 	defer db.Close()
 
-	var close func()
-	logger, close, err = setupLogger("./cmd/aozora-collector/log.json")
+	var closeLogger func() error
+	logger, closeLogger, err = setupLogger(logfilePath)
 	if err != err {
 		log.Fatal(err)
 	}
-	defer close()
+	defer func() {
+		if closeLogger == nil {
+			// in case of testing, closing logger will be done at teardown fuction
+			return
+		}
+		if err := closeLogger(); err != nil {
+			log.Println("Error during closing logger:", err)
+		}
+	}()
 
 	URLForListOfWorksByAkutagawa := "http://www.aozora.gr.jp/index_pages/person879.html"
 

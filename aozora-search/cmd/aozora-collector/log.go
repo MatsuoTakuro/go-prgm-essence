@@ -8,7 +8,14 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func setupLogger(logFile string) (*zap.Logger, func(), error) {
+var logger *zap.Logger
+
+func setupLogger(logFile string) (*zap.Logger, func() error, error) {
+	if logger != nil {
+		// in case of testing, already set it up
+		return logger, nil, nil
+	}
+
 	// Open the log file
 	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
@@ -30,12 +37,11 @@ func setupLogger(logFile string) (*zap.Logger, func(), error) {
 
 	// Create a new zap.Logger
 	logger := zap.New(core)
-	return logger, func() {
+
+	return logger, func() error {
 		if err := logger.Sync(); err != nil {
 			log.Println(err)
 		}
-		if err := file.Close(); err != nil {
-			log.Println(err)
-		}
+		return file.Close()
 	}, nil
 }
