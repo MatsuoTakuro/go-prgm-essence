@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 	// Run the tests and capture the exit code
 	code := m.Run()
 
-	// WARN: if defined as defer func, it will not be executed
+	// WARN: if defined as defer func, this teardown func will not be executed
 	// cuz the subsequent os.Exit will immediately terminate the program without calling defer func.
 	teardown()
 
