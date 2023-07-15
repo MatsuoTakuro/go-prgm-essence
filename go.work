@@ -4,4 +4,6 @@ use (
 	./aozora-search
 	./cobra-cli
 	./todo-webapp
+	./go-hsd
+	./small-binarysize
 )
